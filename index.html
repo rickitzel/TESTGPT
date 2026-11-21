@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Test Master">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Test Master</title>
+<style>
+:root{--bg:#0b1020;--card:#151c35;--card2:#1c2547;--tx:#eef1ff;--mu:#8e98c4;--ac:#7c5cff;--ac2:#22d3ee;--ok:#22c55e;--ko:#ef4444;--wa:#f59e0b;--r:20px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#2a1f6b55,transparent),radial-gradient(900px 500px at 110% 10%,#0e749044,transparent),var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100%}
+body{padding:env(safe-area-inset-top) 0 0}
+#app{max-width:720px;margin:0 auto;padding:14px 14px 110px}
+h1{font-size:22px;margin:0}h2{font-size:18px;margin:18px 0 10px}h3{margin:0 0 6px;font-size:16px}
+.card{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid #ffffff12;border-radius:var(--r);padding:16px;margin:10px 0;box-shadow:0 10px 30px #0006}
+.row{display:flex;gap:10px;align-items:center}.sp{justify-content:space-between}.wrap{flex-wrap:wrap}.g{flex:1}
+.mu{color:var(--mu);font-size:13px}.sm{font-size:13px}
+button,.btn{font:inherit;color:var(--tx);background:#ffffff14;border:1px solid #ffffff1f;border-radius:14px;padding:11px 16px;cursor:pointer;transition:transform .12s,background .2s}
+button:active{transform:scale(.96)}
+.pri{background:linear-gradient(135deg,var(--ac),#5b8cff);border:0;font-weight:700;box-shadow:0 6px 20px #7c5cff66}
+.dng{background:#ef444422;border-color:#ef444466}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{padding:16px;border-radius:var(--r);text-align:left;background:linear-gradient(150deg,#232c5a,#171f40);border:1px solid #ffffff14;min-height:104px;display:flex;flex-direction:column;justify-content:space-between}
+.tile b{font-size:16px}.tile .e{font-size:28px}
+.tile.big{grid-column:span 2;background:linear-gradient(135deg,#6d4dff,#2b7cff);min-height:96px}
+.bar{height:10px;background:#ffffff18;border-radius:9px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--ac2),var(--ac));border-radius:9px;transition:width .5s}
+.ring{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--ac2) var(--p),#ffffff18 0);flex:none}
+.ring span{width:54px;height:54px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:800;font-size:20px}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;background:#ffffff18}
+.ok{color:var(--ok)}.ko{color:var(--ko)}.wa{color:var(--wa)}
+.pill.validated{background:#22c55e33;color:#7dffa8}.pill.rejected{background:#ef444433;color:#ff9a9a}.pill.pending_validation,.pill.needs_review{background:#f59e0b33;color:#ffd27a}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-around;background:#0b1020ee;backdrop-filter:blur(14px);border-top:1px solid #ffffff14;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:5}
+nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--mu);padding:6px 12px}
+nav button .e{font-size:22px}nav button.on{color:#fff}nav button.on .e{filter:drop-shadow(0 0 8px var(--ac))}
+.opt{display:block;width:100%;text-align:left;margin:9px 0;padding:15px 16px;border-radius:16px;background:#ffffff0f;border:2px solid #ffffff14;font-size:16px}
+.opt.sel{border-color:var(--ac);background:#7c5cff26}.opt.good{border-color:var(--ok);background:#22c55e26;animation:pop .35s}.opt.bad{border-color:var(--ko);background:#ef444426;animation:shake .35s}
+@keyframes pop{50%{transform:scale(1.03)}}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.q{font-size:19px;font-weight:600;line-height:1.4}
+.modal{position:fixed;inset:0;background:#000a;display:grid;place-items:end center;z-index:20;animation:fade .2s}
+.modal>div{background:var(--card);width:100%;max-width:720px;max-height:88vh;overflow:auto;border-radius:24px 24px 0 0;padding:18px 18px calc(22px + env(safe-area-inset-bottom))}
+@keyframes fade{from{opacity:0}}
+textarea,input,select{width:100%;font:inherit;color:var(--tx);background:#0b1020;border:1px solid #ffffff25;border-radius:12px;padding:10px;margin:6px 0}
+textarea{min-height:140px}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);background:#22c55e;color:#04210f;font-weight:700;padding:10px 18px;border-radius:99px;z-index:50;animation:fade .2s;max-width:90%;text-align:center}
+.toast.err{background:#ef4444;color:#fff}
+.xp{position:fixed;left:50%;top:38%;transform:translateX(-50%);font-size:34px;font-weight:900;color:var(--ac2);text-shadow:0 0 20px var(--ac2);pointer-events:none;animation:up 1s forwards;z-index:30}
+@keyframes up{to{transform:translate(-50%,-90px);opacity:0}}
+.cf{position:fixed;top:-10px;width:10px;height:14px;z-index:40;animation:fall 2.2s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.heat{display:flex;flex-wrap:wrap;gap:3px}.heat i{width:16px;height:16px;border-radius:4px;background:#ffffff15}
+.quote{border-left:3px solid var(--ac2);padding:6px 12px;margin:8px 0;color:#cfd6ff;background:#ffffff08;border-radius:0 10px 10px 0;font-size:14px}
+.ov{position:fixed;inset:0;background:#0b1020ee;display:grid;place-items:center;z-index:40;text-align:center;padding:30px}
+.flame{font-size:26px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:#ffffff12;padding:6px 10px;border-radius:12px;margin:3px;font-size:13px}.badge.off{opacity:.35;filter:grayscale(1)}
+
+:focus-visible{outline:3px solid var(--ac2);outline-offset:3px}
+button:disabled{opacity:.45;cursor:not-allowed}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+@media(min-width:760px){#app{padding-top:24px}.card{padding:20px}.modal>div{border-radius:24px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav id="nav"></nav>
+<input type="file" id="file" accept=".pdf,.txt,.md,application/pdf,text/plain" multiple hidden>
+<input type="file" id="imp" accept=".json,application/json" hidden>
+<script>
+//CORE-START
+const uid=()=>(globalThis.crypto&&crypto.randomUUID?crypto.randomUUID():'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,10));
+const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9%€\s]/g,' ').replace(/\s+/g,' ').trim();
+function rng(seed){let a=seed>>>0||1;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const shuffle=(arr,r)=>{const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const toks=s=>new Set(norm(s).split(' ').filter(w=>w.length>2));
+const jacc=(a,b)=>{const A=toks(a),B=toks(b);let i=0;A.forEach(x=>{if(B.has(x))i++});return A.size+B.size-i?i/(A.size+B.size-i):0};
+function cleanText(t){return t.replace(/\r/g,'').replace(/([a-záéíóúñ])-\n([a-záéíóúñ])/g,'$1$2').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim()}
+const HEAD=/^(art[ií]culo|cap[ií]tulo|t[ií]tulo|tema|secci[oó]n|anexo|disposici[oó]n)\b.{0,90}$/i;
+function isHeading(l){l=l.trim();return l.length>2&&l.length<=90&&(HEAD.test(l)||(l===l.toUpperCase()&&/[A-ZÁÉÍÓÚÑ]{4}/.test(l)&&!/[.]$/.test(l)))}
+function sentences(t){
+  const p=t.replace(/\b(art|arts|núm|pág|págs|apdo|ap|Sr|Sra|Dr|etc|ej|vs)\.\s/gi,m=>m.replace('.','\u2024')).replace(/(\d)\.(\d)/g,'$1\u2024$2');
+  const m=p.replace(/\s+/g,' ').match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[];
+  return m.map(s=>s.replace(/\u2024/g,'.').trim()).filter(s=>s.length>=40&&s.length<=320);
+}
+function buildChunks(vid,pages){
+  const chunks=[],sections=[];
+  pages.forEach(p=>{
+    if(p.flag)return;let sec='',buf=[];
+    const flush=()=>{sentences(buf.join(' ')).forEach(s=>chunks.push({id:vid+'-'+p.n+'-'+chunks.length,page:p.n,sec,text:s}));buf=[]};
+    p.text.split('\n').forEach(l=>{if(isHeading(l)){flush();sec=l.trim();sections.push({title:sec,page:p.n})}else if(l.trim())buf.push(l.trim())});
+    flush();
+  });
+  return{chunks,sections};
+}
+const _dn=new WeakMap();
+function docNorm(ver){let v=_dn.get(ver);if(!v){v=ver.pages.map(p=>norm(p.text)).join(' ');_dn.set(ver,v)}return v}
+const NUM=/(\d{1,4})\s*(días hábiles|días naturales|días|día|meses|mes|años|año|horas|hora|semanas|semana|euros|%|por ciento|puntos|metros|km|kg)(?![a-záéíóúñ])/i;
+const SG={'día':'día','días':'día','año':'año','años':'año','mes':'mes','meses':'mes','semana':'semana','semanas':'semana','hora':'hora','horas':'hora'},PLU={'día':'días','año':'años','mes':'meses','semana':'semanas','hora':'horas'};
+const inflect=(u,v)=>{const k=SG[u.toLowerCase()];return k?(v===1?k:PLU[k]):u};
+function variantInDoc(docN,sentence,target,rep){
+  const nr=norm(sentence.replace(target,rep)),nrep=norm(rep),i=nr.indexOf(nrep);
+  if(i<0||!nrep)return true;
+  return docN.includes(nr.slice(Math.max(0,i-30),i+nrep.length+30));
+}
+function parseList(t){
+  const i=t.indexOf(':');if(i<10||i>200)return null;
+  const head=t.slice(0,i).trim(),rest=t.slice(i+1).replace(/[.;]\s*$/,'');
+  const raw=rest.split(/\s*[,;]\s*|\s+y\s+/);
+  const items=raw.map(x=>x.replace(/^[a-z0-9]{1,2}[).]\s*/i,'').trim()).filter(x=>x.length>=2&&x.length<=40&&x.split(' ').length<=3);
+  return items.length>=3&&items.length===raw.length?{head,items}:null;
+}
+function genQuestions(ver,max=80){
+  const r=rng(parseInt((ver.hash||'1').slice(0,8),16)||1),docN=docNorm(ver),chunks=ver.chunks;
+  const freq={};chunks.forEach(c=>(c.text.match(/[A-Za-zÁÉÍÓÚÑáéíóúñü]{7,}/g)||[]).forEach(w=>{const k=w.toLowerCase();freq[k]=(freq[k]||0)+1}));
+  const vocab=Object.keys(freq),pool=[];
+  chunks.forEach(c=>{const L=parseList(c.text);if(L)L.items.forEach(i=>pool.push({i,c:c.id}))});
+  const mk=(c,kind,diff,qtext,correct,ds)=>{
+    const opts=shuffle([correct,...ds.slice(0,3)],r);
+    return{id:uid(),vid:ver.id,docId:ver.docId,kind,q:qtext,opts,ans:opts.indexOf(correct),
+      expl:`Según la pág. ${c.page}${c.sec?' ('+c.sec+')':''}: «${c.text}»`,
+      ev:{vid:ver.id,page:c.page,chunkId:c.id,quote:c.text},diff,meta:{target:correct,sentence:c.text},
+      state:'draft',created:Date.now(),srs:{box:0,due:0},st:{seen:0,ok:0,ko:0,last:0},fav:false};
+  };
+  const tryNum=c=>{
+    const m=c.text.match(NUM);if(!m||c.text.split(m[0]).length!==2)return null;
+    const n=+m[1],inf=!!SG[m[2].toLowerCase()];
+    const cand=[...new Set([n*2,Math.max(1,Math.round(n/2)),n+5,n+10,n+1,Math.max(1,n-5),n*3,n+15,n+2])].filter(v=>v!==n&&v>0&&(inf||v!==1));
+    const ds=[];
+    for(const v of shuffle(cand,r)){const o=String(v)+m[0].slice(m[1].length).replace(m[2],inflect(m[2],v));if(!variantInDoc(docN,c.text,m[0],o))ds.push(o);if(ds.length===3)break}
+    if(ds.length<3)return null;
+    return mk(c,'number','media',`Complete correctamente el texto: «${c.text.replace(m[0],'_____')}»`,m[0],ds);
+  };
+  const tryList=c=>{
+    const L=parseList(c.text);if(!L)return null;
+    const it=shuffle(L.items,r)[0],nt=norm(c.text),wc=it.split(' ').length,sameHead=chunks.filter(x=>norm(x.text).startsWith(norm(L.head).slice(0,25))).map(x=>norm(x.text)).join(' ');
+    const ds=[];
+    for(const p of shuffle(pool.filter(p=>p.c!==c.id&&p.i.split(' ').length===wc),r)){
+      const n=norm(p.i);if(!nt.includes(n)&&!sameHead.includes(n)&&!ds.some(d=>norm(d)===n))ds.push(p.i);if(ds.length===3)break}
+    if(ds.length<3)return null;
+    return mk(c,'list','dificil',`Según el texto, ¿cuál de estos elementos pertenece a la enumeración «${L.head}»?`,it,ds);
+  };
+  const tryCloze=c=>{
+    const ws=(c.text.match(/[A-Za-zÁÉÍÓÚÑáéíóúñü]{8,}/g)||[]).filter(w=>c.text.indexOf(w)>0&&c.text.split(w).length===2);
+    if(!ws.length)return null;
+    const w=shuffle(ws,r)[0],cap=w[0]!==w[0].toLowerCase(),nt=norm(c.text),ds=[];
+    for(const v of shuffle(vocab.filter(v=>Math.abs(v.length-w.length)<=3&&v.slice(0,4)!==w.slice(0,4).toLowerCase()&&!nt.includes(norm(v))),r)){
+      const d=cap?v[0].toUpperCase()+v.slice(1):v;
+      if(!variantInDoc(docN,c.text,w,d))ds.push(d);if(ds.length===3)break}
+    if(ds.length<3)return null;
+    return mk(c,'cloze',(freq[w.toLowerCase()]||1)>2?'facil':'media',`Complete la frase: «${c.text.replace(w,'_____')}»`,w,ds);
+  };
+  const out=[];
+  for(const c of shuffle(chunks,r)){if(out.length>=max)break;const q=tryNum(c)||tryList(c)||tryCloze(c);if(q)out.push(q)}
+  return out;
+}
+function verifyQ(q,ver,others){
+  const ck=[],add=(name,ok,crit,why)=>ck.push({name,ok:!!ok,crit:crit!==false,why:why||name});
+  const fin=()=>{
+    const bad=ck.filter(c=>!c.ok),crit=bad.filter(c=>c.crit),soft=bad.filter(c=>!c.crit);
+    let score=100-soft.length*10-(crit.length?50:0),state;
+    if(!crit.length&&score>=90)state='validated';
+    else if(q&&q.kind==='ext'&&crit.length===1&&crit[0].name==='respuesta_respaldada_humana')state='pending_validation';
+    else state=crit.length?'rejected':'needs_review';
+    return{checks:ck,score,state,reasons:bad.map(b=>b.why)};
+  };
+  const sch=q&&typeof q.q==='string'&&q.q.length>=10&&Array.isArray(q.opts)&&q.opts.length===4&&q.opts.every(o=>typeof o==='string'&&o.trim())&&Number.isInteger(q.ans)&&q.ans>=0&&q.ans<4&&q.ev&&typeof q.ev.quote==='string'&&Number.isInteger(q.ev.page);
+  add('esquema',sch,true,'Esquema de datos inválido');
+  if(!sch)return fin();
+  add('version',q.vid===ver.id,true,'Versión del documento no coincide');
+  const pg=ver.pages.find(p=>p.n===q.ev.page);
+  add('pagina_valida',pg&&!pg.flag,true,'Página inexistente o con calidad dudosa');
+  const pn=pg?norm(pg.text):'',nq=norm(q.ev.quote);
+  add('fragmento_en_pagina',nq.length>=20&&pn.includes(nq),true,'La cita no aparece en la página indicada');
+  if(q.ev.chunkId)add('fragmento_existe',ver.chunks.some(c=>c.id===q.ev.chunkId&&norm(c.text).includes(nq)),true,'Fragmento inexistente');
+  add('opciones_unicas',new Set(q.opts.map(norm)).size===4,true,'Alternativas repetidas');
+  const cor=norm(q.opts[q.ans]);
+  if(q.kind==='ext'){add('respuesta_respaldada_humana',false,true,'Requiere revisión humana')}
+  else{
+    add('respuesta_respaldada',cor&&nq.includes(cor),true,'La respuesta correcta no está respaldada por la cita');
+    add('distractores_fuera_del_texto',q.opts.every((o,i)=>i===q.ans||!nq.includes(norm(o))),true,'Un distractor aparece en la fuente');
+    if(q.kind!=='list'&&q.meta){const dn=docNorm(ver);add('distractor_no_valido_en_doc',q.opts.every((o,i)=>i===q.ans||!variantInDoc(dn,q.meta.sentence,q.meta.target,o)),true,'Un distractor podría ser correcto según el documento')}
+  }
+  add('explicacion_fiel',typeof q.expl==='string'&&(q.expl.includes(q.ev.quote)||norm(q.expl).includes(nq)),false,'Explicación no cita la fuente');
+  add('sin_duplicado',!(others||[]).some(o=>o.id!==q.id&&o.state!=='rejected'&&jacc(q.q+' '+q.opts[q.ans],o.q+' '+o.opts[o.ans])>0.85),true,'Pregunta duplicada');
+  add('longitud',q.q.length<=420,false,'Enunciado demasiado largo');
+  return fin();
+}
+const INTERVALS=[0,1,3,7,16,35];
+function srsUpdate(q,ok,now=Date.now()){q.st.seen++;q.st.last=now;if(ok){q.st.ok++;q.srs.box=Math.min(5,q.srs.box+1)}else{q.st.ko++;q.srs.box=0}q.srs.due=now+INTERVALS[q.srs.box]*864e5}
+function pickExam(pool,n,r,now=Date.now()){
+  const sc=new Map(pool.map(q=>[q.id,((q.srs.due<=now&&q.st.seen>0)?3:0)+(q.st.ko>0&&q.st.ok<=q.st.ko?2:0)+(q.st.seen===0?1.5:0)-((now-q.st.last)<3*864e5&&q.st.seen>0?2:0)+r()]));
+  const sorted=pool.slice().sort((a,b)=>sc.get(b.id)-sc.get(a.id)),groups={};
+  sorted.forEach(q=>(groups[q.ev.page]=groups[q.ev.page]||[]).push(q));
+  const keys=shuffle(Object.keys(groups),r),out=[];
+  while(out.length<n&&keys.some(k=>groups[k].length))for(const k of keys)if(groups[k].length&&out.length<n)out.push(groups[k].shift());
+  return shuffle(out,r);
+}
+const levelOf=xp=>Math.floor(Math.sqrt(xp/60))+1;
+function txtPages(text){
+  const t=cleanText(text),paras=t.split(/\n\s*\n/),pages=[];let cur='';
+  paras.forEach(p=>{if(cur.length+p.length>2800&&cur){pages.push(cur);cur=''}cur+=(cur?'\n\n':'')+p});if(cur)pages.push(cur);
+  return pages.map((x,i)=>({n:i+1,text:x,src:'text',conf:null,flag:false}));
+}
+//CORE-END
+
+/* ============ Almacenamiento (IndexedDB, todo local) ============ */
+let db;
+const STORES=['docs','versions','questions','kv','audit','sessions','files'];
+const openDB=()=>new Promise((res,rej)=>{const r=indexedDB.open('testmaster',1);r.onupgradeneeded=()=>STORES.forEach(s=>r.result.createObjectStore(s,{keyPath:'id'}));r.onsuccess=()=>{db=r.result;res()};r.onerror=()=>rej(r.error)});
+const P=r=>new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const st=(s,m)=>db.transaction(s,m||'readonly').objectStore(s);
+const dbAll=s=>P(st(s).getAll()),dbGet=(s,id)=>P(st(s).get(id)),dbPut=(s,o)=>P(st(s,'readwrite').put(o)),dbDel=(s,id)=>P(st(s,'readwrite').delete(id)),dbClear=s=>P(st(s,'readwrite').clear());
+async function sha256(buf){
+  if(!globalThis.crypto?.subtle) throw new Error('Este navegador no permite SHA-256 en este contexto. Abre la app mediante HTTPS o localhost.');
+  const h=await crypto.subtle.digest('SHA-256',buf);
+  return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function audit(type,msg,extra){await dbPut('audit',{id:Date.now()+'-'+Math.random().toString(36).slice(2,6),ts:Date.now(),type,msg:String(msg).slice(0,300),...(extra||{})})}
+
+/* ============ Estado ============ */
+const S={tab:'home',docs:[],vers:[],qs:[],prof:null,run:null,modal:null,busy:null,sessions:[]};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=s=>document.querySelector(s);
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const DEF={id:'profile',xp:0,streak:0,best:0,lastDay:'',todayDay:'',todayN:0,exams:0,correct:0,answered:0,perfect:0,sound:true,ocr:true,goal:20};
+async function load(){
+  S.docs=await dbAll('docs');S.vers=await dbAll('versions');S.qs=await dbAll('questions');S.sessions=await dbAll('sessions');
+  S.prof=Object.assign({},DEF,await dbGet('kv','profile')||{});
+}
+const saveProf=()=>dbPut('kv',S.prof);
+const curVer=d=>S.vers.find(v=>v.id===d.cur);
+const curQs=(f)=>S.qs.filter(q=>S.docs.some(d=>d.cur===q.vid)&&(!f||f(q)));
+const valid=()=>curQs(q=>q.state==='validated');
+
+/* ============ UI helpers ============ */
+let AC;function beep(f,d=.12,t='sine'){if(!S.prof.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=.07;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
+const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
+function toast(m,err){const t=document.createElement('div');t.className='toast'+(err?' err':'');t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),err?4200:2600)}
+function floatXP(n){const e=document.createElement('div');e.className='xp';e.textContent='+'+n+' XP';document.body.appendChild(e);setTimeout(()=>e.remove(),1000)}
+function confetti(){for(let i=0;i<46;i++){const e=document.createElement('i');e.className='cf';e.style.left=Math.random()*100+'vw';e.style.background=['#7c5cff','#22d3ee','#22c55e','#f59e0b','#ef4444'][i%5];e.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(e);setTimeout(()=>e.remove(),3000)}}
+const modal=h=>{S.modal=h;render()};const closeModal=()=>{S.modal=null;render()};
+const bump=()=>{const t=today();if(S.prof.todayDay!==t){S.prof.todayDay=t;S.prof.todayN=0}};
+function touchStreak(){
+  const t=today();if(S.prof.lastDay===t)return;
+  const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
+  S.prof.streak=S.prof.lastDay===ys?S.prof.streak+1:1;S.prof.best=Math.max(S.prof.best,S.prof.streak);S.prof.lastDay=t;
+}
+function gainXP(n){const l0=levelOf(S.prof.xp);S.prof.xp+=n;floatXP(n);if(levelOf(S.prof.xp)>l0){toast('🎉 ¡Nivel '+levelOf(S.prof.xp)+'!');beep(880,.3,'triangle');confetti()}}
+const ACH=[
+ ['🚀','Primer examen',p=>p.exams>=1],['🔥','Racha de 3 días',p=>p.best>=3],['🔥','Racha de 7 días',p=>p.best>=7],['🏆','Examen perfecto',p=>p.perfect>=1],
+ ['💯','100 aciertos',p=>p.correct>=100],['🧠','500 aciertos',p=>p.correct>=500],['⭐','Nivel 5',p=>levelOf(p.xp)>=5],['👑','Nivel 10',p=>levelOf(p.xp)>=10]];
+
+/* ============ Procesamiento documental ============ */
+const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',PDFW='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',TESS='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+const loadScript=src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('No se pudo cargar '+src+' (¿sin conexión la primera vez?)'));document.head.appendChild(s)});
+async function pdfLib(){if(!window.pdfjsLib){await loadScript(PDFJS);pdfjsLib.GlobalWorkerOptions.workerSrc=PDFW}return pdfjsLib}
+let OCR_WORKER=null;
+async function ocrCanvas(canvas){
+  if(!window.Tesseract) await loadScript(TESS);
+  if(!OCR_WORKER) OCR_WORKER=await Tesseract.createWorker('spa');
+  try{const{data}=await OCR_WORKER.recognize(canvas);return{text:data.text,conf:Math.round(data.confidence)}}
+  catch(e){try{await OCR_WORKER.terminate()}catch(_){}OCR_WORKER=null;throw e}
+}
+const progress=(msg,pct)=>{S.busy=msg?{msg,pct}:null;render()};
+async function ocrPage(pdf,n){
+  const pg=await pdf.getPage(n),vp=pg.getViewport({scale:2}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
+  await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;return ocrCanvas(cv);
+}
+async function extractPdf(buf,onp,only){
+  const lib=await pdfLib(),pdf=await lib.getDocument({data:buf.slice(0)}).promise,pages=[];
+  for(let n=1;n<=pdf.numPages;n++){
+    if(only&&only!==n){pages.push(null);continue}
+    onp&&onp('Extrayendo texto · pág. '+n+'/'+pdf.numPages,n/pdf.numPages);
+    const pg=await pdf.getPage(n),tc=await pg.getTextContent();let t='',ly=null;
+    for(const it of tc.items){if(ly!==null&&Math.abs(it.transform[5]-ly)>2)t+='\n';else if(t&&!t.endsWith(' ')&&!t.endsWith('\n'))t+=' ';t+=it.str;ly=it.transform[5]}
+    t=cleanText(t);let src='native',conf=null,flag=false;
+    if(t.length<40){
+      if(S.prof.ocr){try{onp&&onp('OCR · pág. '+n+'/'+pdf.numPages,n/pdf.numPages);const o=await ocrPage(pdf,n);t=cleanText(o.text);src='ocr';conf=o.conf;if(conf<70||t.length<40)flag='OCR de baja confianza ('+conf+'%)'}catch(e){flag='Sin texto y OCR no disponible'}}
+      else flag='Sin texto nativo (OCR desactivado)';
+    }
+    pages.push({n,text:t,src,conf,flag});
+  }
+  return{pages,pdf};
+}
+async function registerVersion(name,hash,pages,size,blob){
+  let doc=S.docs.find(d=>d.name===name);
+  if(!doc){doc={id:uid(),name,created:Date.now(),vcount:0,cur:null};}
+  const old=doc.cur;doc.vcount++;
+  if(old){for(const q of S.qs.filter(q=>q.vid===old&&q.state!=='archived')){q.prevState=q.state;q.state='archived';await dbPut('questions',q)}}
+  const vid=uid(),{chunks,sections}=buildChunks(vid,pages);
+  const ver={id:vid,docId:doc.id,n:doc.vcount,hash,size,pages,chunks,sections,processed:Date.now(),extractor:'pdfjs-3.11.174/dom-1',ocr:'tesseract-5/spa',status:'indexado'};
+  doc.cur=vid;await dbPut('docs',doc);await dbPut('versions',ver);if(blob)await dbPut('files',{id:vid,blob});
+  await audit('doc',`Documento "${name}" v${ver.n} indexado (${pages.length} págs, ${chunks.length} fragmentos)`);
+  if(old)await audit('doc',`Versión anterior de "${name}" conservada (preguntas archivadas)`);
+  await load();return ver;
+}
+async function generateFor(ver,max){
+  const t0=Date.now();progress('Generando y verificando preguntas…',.9);
+  const existing=S.qs.filter(q=>q.vid===ver.id);
+  const cands=genQuestions(ver,max||80),acc=[...existing],reasons={};let v=0,r=0,p=0;
+  for(const q of cands){
+    const res=verifyQ(q,ver,acc);
+    if(res.reasons.length===1&&res.reasons[0]==='Pregunta duplicada'&&existing.length)continue;
+    q.state=res.state;q.score=res.score;q.checks=res.checks;q.reasons=res.reasons;q.validatedAt=Date.now();
+    if(q.state==='validated')v++;else if(q.state==='rejected'){r++;res.reasons.forEach(x=>reasons[x]=(reasons[x]||0)+1)}else p++;
+    acc.push(q);await dbPut('questions',q);
+  }
+  const ms=Date.now()-t0;await audit('job',`Generación v${ver.n}: ${v+r+p} propuestas, ${v} validadas, ${r} rechazadas`,{proposed:v+r+p,validated:v,rejected:r,pending:p,reasons,ms,tokens:0,cost:0});
+  await load();return{proposed:v+r+p,v,r,p};
+}
+async function ingest(file){
+  try{
+    const MAX_FILE=35*1024*1024;
+    if(!file) return;
+    if(file.size>MAX_FILE) throw new Error('El archivo supera 35 MB. Divide el PDF en partes más pequeñas.');
+    if(!(/\.pdf$/i.test(file.name)||/\.(txt|md)$/i.test(file.name)||file.type==='application/pdf'||file.type==='text/plain'))
+      throw new Error('Formato no admitido. Usa PDF, TXT o MD.');
+    progress('Calculando huella SHA-256…',.02);
+    const buf=await file.arrayBuffer(),hash=await sha256(buf);
+    if(S.vers.some(v=>v.hash===hash)){progress(null);toast('Documento idéntico: ya estaba procesado (0 coste)');return}
+    let pages,blob=null;
+    if(/\.pdf$/i.test(file.name)||file.type==='application/pdf'){const e=await extractPdf(buf,progress);pages=e.pages;blob=new Blob([buf],{type:'application/pdf'})}
+    else pages=txtPages(new TextDecoder().decode(buf));
+    if(!pages.length||pages.every(p=>p.text.length<40&&!p.flag))throw new Error('No se encontró texto utilizable');
+    progress('Indexando contenido…',.8);
+    const ver=await registerVersion(file.name,hash,pages,buf.byteLength,blob);
+    const res=await generateFor(ver);progress(null);
+    const fl=pages.filter(p=>p.flag).length;
+    toast(`✅ ${res.v} preguntas validadas, ${res.r} rechazadas${res.p?', '+res.p+' pendientes':''}${fl?' · '+fl+' págs. en revisión':''}`);
+  }catch(e){progress(null);await audit('error',e.message);toast('Error: '+e.message,true)}
+}
+async function ingestText(name,text){
+  try{
+    if(!String(text||'').trim()) throw new Error('Pega primero el contenido del temario.');
+    if(text.length>2_000_000) throw new Error('El texto supera 2 millones de caracteres. Divídelo en varios documentos.');
+    const buf=new TextEncoder().encode(text),hash=await sha256(buf.buffer);
+    if(S.vers.some(v=>v.hash===hash)){toast('Texto idéntico ya procesado');return}
+    const pages=txtPages(text);if(!pages.length)throw new Error('Texto vacío');
+    const ver=await registerVersion(name||'Texto pegado',hash,pages,buf.byteLength,null),res=await generateFor(ver);progress(null);
+    toast(`✅ ${res.v} validadas, ${res.r} rechazadas`);
+  }catch(e){progress(null);toast('Error: '+e.message,true)}
+}
+
+/* ============ Exámenes ============ */
+const pub=q=>({id:q.id,q:q.q,opts:q.opts});
+async function startRun({mode,docIds,n,learn,secs}){
+  let pool=valid();if(docIds&&docIds.length)pool=pool.filter(q=>docIds.includes(q.docId));
+  const now=Date.now();
+  if(mode==='review')pool=pool.filter(q=>q.st.seen>0&&q.srs.due<=now);
+  if(mode==='failed')pool=pool.filter(q=>q.st.ko>0&&q.st.ok<=q.st.ko);
+  if(mode==='fav')pool=pool.filter(q=>q.fav);
+  const want=n||40;
+  if(pool.length<want&&(mode==='sim'||mode==='custom')){
+    modal(`<h2>No hay suficientes preguntas verificadas</h2><p>Existen <b>${pool.length}</b> preguntas validadas en este alcance y el examen pedía <b>${want}</b>. No se inventan las que faltan.</p><p class="mu">Falta contenido: añade más documentos o texto, o reduce el tamaño.</p>
+    <div class="row wrap">${pool.length?`<button class="pri" data-a="runN" data-mode="${mode}" data-n="${pool.length}" data-learn="${learn?1:0}" data-docs="${(docIds||[]).join(',')}">Hacer examen de ${pool.length}</button>`:''}<button data-a="tab" data-t="lib">Añadir material</button><button data-a="close">Cerrar</button></div>`);return;
+  }
+  if(!pool.length){toast(mode==='review'?'🎉 Nada pendiente de repaso hoy':'No hay preguntas para este modo',true);return}
+  const ids=pickExam(pool,Math.min(want,pool.length),Math.random).map(q=>q.id);
+  S.run={id:uid(),mode,learn:!!learn,ids,i:0,ans:{},t0:Date.now(),secs:secs||0,combo:0,xp:0,done:false,res:null,locked:false,sel:null,left:secs||0};
+  S.modal=null;S.tab='run';await saveRun();render();startTimer();
+}
+const saveRun=()=>dbPut('sessions',{id:S.run.id,status:'open',run:{...S.run,res:null},ts:Date.now()});
+let TM,lastTimerSave=0;
+function startTimer(){
+  clearInterval(TM);
+  if(!S.run||!S.run.secs||S.run.done)return;
+  if(!Number.isFinite(S.run.left)||S.run.left<=0) S.run.left=S.run.secs;
+  TM=setInterval(()=>{
+    if(!S.run||S.run.locked||S.run.done)return;
+    S.run.left=Math.max(0,S.run.left-1);
+    const b=$('#tb');if(b)b.style.width=(S.run.left/S.run.secs*100)+'%';
+    if(Date.now()-lastTimerSave>5000){lastTimerSave=Date.now();saveRun().catch(()=>{})}
+    if(S.run.left<=0)choose(-1);
+  },1000);
+}
+const qOf=id=>S.qs.find(q=>q.id===id);
+async function applyResult(q,ok){
+  srsUpdate(q,ok);await dbPut('questions',q);bump();S.prof.answered++;S.prof.todayN++;if(ok)S.prof.correct++;touchStreak();
+}
+async function choose(i){
+  const R=S.run;if(!R||R.locked)return;const q=qOf(R.ids[R.i]);
+  if(!R.learn){R.sel=i;R.ans[R.i]=i;render();return}
+  R.locked=true;R.sel=i;R.ans[R.i]=i;const ok=i===q.ans;
+  await applyResult(q,ok);
+  if(ok){R.combo++;const x=10+Math.min(R.combo,10)*2;R.xp+=x;gainXP(x);beep(660,.12,'triangle');beep(990,.15,'triangle');buzz(20)}else{R.combo=0;beep(180,.25,'sawtooth');buzz([60,40,60])}
+  await saveProf();await saveRun();render();
+}
+async function nextQ(){
+  const R=S.run;if(R.i+1>=R.ids.length)return finishRun();
+  R.i++;R.locked=false;R.sel=R.ans[R.i]!=null?R.ans[R.i]:null;R.left=R.secs;await saveRun();render();startTimer();
+}
+async function finishRun(){
+  const R=S.run;clearInterval(TM);let ok=0,det=[];
+  for(let k=0;k<R.ids.length;k++){
+    const q=qOf(R.ids[k]),a=R.ans[k]!=null?R.ans[k]:-1,good=a===q.ans;if(good)ok++;
+    if(!R.learn)await applyResult(q,good);
+    det.push({id:q.id,a,good});
+  }
+  const pct=Math.round(ok/R.ids.length*100);let bonus=Math.round(pct/2)+(pct===100?50:0);
+  if(!R.learn)R.xp+=ok*10;R.xp+=bonus;
+  S.prof.exams++;if(pct===100&&R.ids.length>=10)S.prof.perfect++;touchStreak();
+  R.done=true;R.res={ok,total:R.ids.length,pct,det,bonus};
+  gainXP(bonus+(R.learn?0:ok*10));await saveProf();
+  await dbPut('sessions',{id:R.id,status:'final',final:true,mode:R.mode,res:R.res,ts:Date.now(),secs:Math.round((Date.now()-R.t0)/1000)});
+  await load();if(pct>=70){confetti();beep(784,.2,'triangle')}render();
+}
+async function toggleFav(id){const q=qOf(id);q.fav=!q.fav;await dbPut('questions',q);render()}
+
+/* ============ Vistas ============ */
+const tabs=[['home','🏠','Inicio'],['lib','📚','Biblioteca'],['rev','🔎','Revisar'],['stats','📊','Progreso'],['more','⚙️','Más']];
+function renderNav(){$('#nav').style.display=S.tab==='run'?'none':'flex';$('#nav').innerHTML=tabs.map(t=>`<button class="${S.tab===t[0]?'on':''}" data-a="tab" data-t="${t[0]}"><span class="e">${t[1]}</span>${t[2]}</button>`).join('')}
+function vHome(){
+  const p=S.prof,L=levelOf(p.xp),base=60*(L-1)**2,next=60*L**2,pc=Math.round((p.xp-base)/(next-base)*100);
+  bump();const goal=Math.min(100,Math.round(p.todayN/p.goal*100)),nv=valid().length,now=Date.now();
+  const due=valid().filter(q=>q.st.seen>0&&q.srs.due<=now).length,failed=valid().filter(q=>q.st.ko>0&&q.st.ok<=q.st.ko).length,favs=valid().filter(q=>q.fav).length;
+  const open=S.sessions.find(s=>s.status==='open');
+  return`<div class="row sp"><div><h1>Test Master</h1><div class="mu">Entrena. Acierta. Sube de nivel.</div></div><div class="flame">🔥 <b>${p.streak}</b></div></div>
+  <div class="card row"><div class="ring" style="--p:${pc}%"><span>${L}</span></div><div class="g"><div class="row sp"><b>Nivel ${L}</b><span class="mu">${p.xp} XP</span></div><div class="bar"><i style="width:${pc}%"></i></div><div class="mu sm" style="margin-top:6px">Meta de hoy: ${p.todayN}/${p.goal} preguntas</div><div class="bar"><i style="width:${goal}%;background:linear-gradient(90deg,#22c55e,#a3e635)"></i></div></div></div>
+  ${open?`<div class="card row sp"><div><b>⏸ Examen sin terminar</b><div class="mu sm">${open.run.ids.length} preguntas · pregunta ${open.run.i+1}</div></div><button class="pri" data-a="resume">Reanudar</button></div>`:''}
+  ${nv===0?`<div class="card"><h3>Empieza aquí 👇</h3><p class="mu">Sube un PDF/TXT/MD (máx. 35 MB) o pega texto en la Biblioteca. La app lo analiza, crea preguntas y solo usa las que puede demostrar con la fuente.</p><button class="pri" data-a="tab" data-t="lib">📚 Añadir material</button></div>`:''}
+  <div class="grid">
+    <button class="tile big" data-a="setup" data-mode="sim"><span class="e">🎯</span><b>Simulacro de 40 preguntas</b><span class="sm">${nv} preguntas verificadas disponibles</span></button>
+    <button class="tile" data-a="runq" data-mode="review"><span class="e">🧠</span><b>Repaso del día</b><span class="mu sm">${due} pendientes</span></button>
+    <button class="tile" data-a="runq" data-mode="failed"><span class="e">❌</span><b>Falladas</b><span class="mu sm">${failed} por dominar</span></button>
+    <button class="tile" data-a="runq" data-mode="fav"><span class="e">⭐</span><b>Favoritas</b><span class="mu sm">${favs} guardadas</span></button>
+    <button class="tile" data-a="runq" data-mode="time"><span class="e">⚡</span><b>Contrarreloj</b><span class="mu sm">10 preguntas · 20 s</span></button>
+  </div>
+  <h2>🏅 Logros</h2><div>${ACH.map(a=>`<span class="badge ${a[2](p)?'':'off'}">${a[0]} ${a[1]}</span>`).join('')}</div>`;
+}
+function vLib(){
+  return`<div class="row sp"><h1>Biblioteca</h1></div>
+  <div class="card"><div class="row wrap"><button class="pri g" data-a="add">📄 Subir PDF / TXT</button><button class="g" data-a="paste">✍️ Pegar texto</button></div>
+  <p class="mu sm">Cada archivo se procesa una sola vez (huella SHA-256 real; requiere HTTPS o localhost). Un archivo idéntico no se vuelve a analizar; uno modificado crea una versión nueva y conserva la anterior.</p></div>
+  ${S.docs.map(d=>{const v=curVer(d);if(!v)return'';const qs=S.qs.filter(q=>q.vid===v.id),c=s=>qs.filter(q=>q.state===s).length,fl=v.pages.filter(p=>p.flag);
+  return`<div class="card"><div class="row sp"><h3>${esc(d.name)}</h3><span class="pill">v${v.n}</span></div>
+  <div class="mu sm">${v.pages.length} págs · ${v.chunks.length} fragmentos · SHA ${esc(v.hash.slice(0,10))}… · ${new Date(v.processed).toLocaleDateString()}</div>
+  <div class="row wrap" style="margin:8px 0"><span class="pill validated">${c('validated')} validadas</span><span class="pill pending_validation">${c('pending_validation')+c('needs_review')} pendientes</span><span class="pill rejected">${c('rejected')} rechazadas</span></div>
+  ${fl.length?`<div class="sm wa">⚠️ ${fl.length} página(s) en revisión por texto dudoso: ${fl.map(p=>`<button data-a="ocr" data-v="${v.id}" data-n="${p.n}" style="padding:2px 8px">${p.n} ↻</button>`).join(' ')}</div>`:''}
+  <div class="row wrap" style="margin-top:8px"><button data-a="toc" data-v="${v.id}">📑 Índice</button><button data-a="extra" data-id="${d.id}">🧩 Importar de otro chat</button><button data-a="runDoc" data-id="${d.id}">▶ Examen</button><button class="dng" data-a="delDoc" data-id="${d.id}">🗑</button></div></div>`}).join('')||'<p class="mu">Aún no hay documentos.</p>'}`;
+}
+function vRev(){
+  const list=curQs(q=>q.state==='pending_validation'||q.state==='needs_review');
+  return`<h1>Revisión</h1><p class="mu">Preguntas que no se pueden demostrar automáticamente (p. ej. las traídas de otro chat). Aprueba solo si la cita respalda la respuesta marcada. Nada de esto aparece en exámenes hasta que lo valides.</p>
+  ${list.map(q=>`<div class="card"><div class="q">${esc(q.q)}</div>${q.opts.map((o,i)=>`<div class="sm ${i===q.ans?'ok':'mu'}">${'ABCD'[i]}) ${esc(o)} ${i===q.ans?'✓':''}</div>`).join('')}
+  <div class="quote">Pág. ${q.ev.page}: ${esc(q.ev.quote)}</div><div class="row"><button class="pri g" data-a="approve" data-id="${q.id}">✅ Aprobar</button><button class="dng g" data-a="reject" data-id="${q.id}">✖ Rechazar</button></div></div>`).join('')||'<div class="card mu">Nada pendiente 🎉</div>'}`;
+}
+function vStats(){
+  const p=S.prof;
+  return`<h1>Progreso</h1><div class="grid"><div class="card"><div class="mu">Respondidas</div><h1>${p.answered}</h1></div><div class="card"><div class="mu">Acierto global</div><h1>${p.answered?Math.round(p.correct/p.answered*100):0}%</h1></div><div class="card"><div class="mu">Exámenes</div><h1>${p.exams}</h1></div><div class="card"><div class="mu">Mejor racha</div><h1>🔥 ${p.best}</h1></div></div>
+  ${S.docs.map(d=>{const v=curVer(d);if(!v)return'';const qs=S.qs.filter(q=>q.vid===v.id&&q.state==='validated');
+  return`<div class="card"><h3>${esc(d.name)}</h3><div class="mu sm">Mapa de dominio por página</div><div class="heat" style="margin-top:8px">${v.pages.map(pg=>{const x=qs.filter(q=>q.ev.page===pg.n&&q.st.seen>0);if(pg.flag)return`<i title="Pág ${pg.n}: en revisión" style="background:#f59e0b66"></i>`;if(!x.length)return`<i title="Pág ${pg.n}"></i>`;const a=x.reduce((s,q)=>s+q.st.ok,0)/x.reduce((s,q)=>s+q.st.seen,0);return`<i title="Pág ${pg.n}: ${Math.round(a*100)}%" style="background:hsl(${a*120} 70% 45%)"></i>`}).join('')}</div></div>`}).join('')}
+  <h2>🗓 Historial</h2>${S.sessions.filter(s=>s.final).sort((a,b)=>b.ts-a.ts).slice(0,15).map(s=>`<div class="card row sp"><div><b>${s.res.ok}/${s.res.total}</b> <span class="mu sm">${new Date(s.ts).toLocaleString()}</span></div><span class="pill ${s.res.pct>=70?'validated':'rejected'}">${s.res.pct}%</span></div>`).join('')||'<p class="mu">Sin exámenes todavía.</p>'}`;
+}
+function vMore(){
+  return`<h1>Más</h1><div class="card"><div class="row sp"><span>🔊 Sonidos</span><button data-a="tog" data-k="sound">${S.prof.sound?'Activados':'Silencio'}</button></div><div class="row sp" style="margin-top:8px"><span>🔍 OCR automático (escaneados)</span><button data-a="tog" data-k="ocr">${S.prof.ocr?'Sí':'No'}</button></div>
+  <div class="row sp" style="margin-top:8px"><span>🎯 Meta diaria</span><select data-a="goal" style="width:100px">${[10,20,40,80].map(n=>`<option ${S.prof.goal===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
+  <div class="card"><h3>💾 Copia de seguridad</h3><p class="mu sm">Exporta documentos indexados, preguntas y progreso con comprobación SHA-256. Los PDF originales no se incluyen: conserva una copia aparte. Para pasar datos a otro dispositivo, exporta e importa el archivo.</p><div class="row"><button class="pri g" data-a="export">Exportar</button><button class="g" data-a="import">Importar</button></div></div>
+  <div class="card"><button data-a="audit" class="g" style="width:100%">🧾 Informe de auditoría</button></div>
+  <div class="card"><button class="dng" data-a="wipe" style="width:100%">Borrar todos los datos</button></div>
+  <p class="mu sm">Todo se guarda en este dispositivo. Coste de IA: 0 €. Las preguntas se generan con reglas deterministas y solo se aceptan si pasan comprobaciones contra el texto original.</p>`;
+}
+function vRun(){
+  const R=S.run;
+  if(R.done){const r=R.res;const fails=r.det.filter(d=>!d.good);
+    return`<div class="card" style="text-align:center"><div style="font-size:54px">${r.pct>=90?'🏆':r.pct>=70?'🎉':r.pct>=50?'💪':'📖'}</div><h1>${r.ok}/${r.total} · ${r.pct}%</h1><p class="mu">${r.pct>=90?'¡Brutal! Dominas esto.':r.pct>=70?'Aprobado. Sigue así.':'Cada fallo es repaso que sumará mañana.'}</p><h2 style="color:var(--ac2)">+${R.xp} XP</h2><div class="row"><button class="pri g" data-a="home">Inicio</button>${fails.length?`<button class="g" data-a="runq" data-mode="failed">Repasar falladas</button>`:''}</div></div>
+    ${fails.length?'<h2>Para repasar</h2>':''}${fails.map(d=>{const q=qOf(d.id);return`<div class="card"><div class="q">${esc(q.q)}</div><div class="sm ko">Tu respuesta: ${d.a>=0?esc(q.opts[d.a]):'sin responder'}</div><div class="sm ok">Correcta: ${esc(q.opts[q.ans])}</div><div class="quote">Pág. ${q.ev.page}: ${esc(q.ev.quote)}</div></div>`}).join('')}`;}
+  const q=qOf(R.ids[R.i]),pb=Math.round(R.i/R.ids.length*100);
+  return`<div class="row sp"><button data-a="exit">✕</button><span class="mu">${R.i+1} / ${R.ids.length}</span><button data-a="fav" data-id="${q.id}">${q.fav?'⭐':'☆'}</button></div>
+  <div class="bar" style="margin:10px 0"><i style="width:${pb}%"></i></div>
+  ${R.secs?`<div class="bar" style="height:6px"><i id="tb" style="width:${R.left/R.secs*100}%;background:linear-gradient(90deg,#f59e0b,#ef4444)"></i></div>`:''}
+  ${R.combo>=2?`<div class="wa" style="font-weight:800;margin-top:6px">🔥 Combo x${R.combo}</div>`:''}
+  <div class="card"><div class="q">${esc(q.q)}</div></div>
+  ${q.opts.map((o,i)=>{let c='opt';if(R.locked){if(i===q.ans)c+=' good';else if(i===R.sel)c+=' bad'}else if(R.sel===i)c+=' sel';return`<button class="${c}" data-a="pick" data-i="${i}"><b>${'ABCD'[i]}</b> &nbsp;${esc(o)}</button>`}).join('')}
+  ${R.locked?`<div class="card"><b class="${R.sel===q.ans?'ok':'ko'}">${R.sel===q.ans?'¡Correcto!':R.sel<0?'⏱ Tiempo agotado':'Incorrecto'}</b><div class="quote">Pág. ${q.ev.page}: ${esc(q.ev.quote)}</div></div>`:''}
+  ${(R.locked||(!R.learn&&R.sel!=null))?`<button class="pri" style="width:100%;margin-top:6px" data-a="next">${R.i+1>=R.ids.length?'Finalizar 🏁':'Siguiente →'}</button>`:''}`;
+}
+function render(){
+  renderNav();
+  const v={home:vHome,lib:vLib,rev:vRev,stats:vStats,more:vMore,run:vRun}[S.tab]();
+  $('#app').innerHTML=v+(S.modal?`<div class="modal" data-a="mbg"><div>${S.modal}</div></div>`:'')+(S.busy?`<div class="ov"><div><div style="font-size:44px">⚙️</div><h2>${esc(S.busy.msg)}</h2><div class="bar" style="width:240px"><i style="width:${Math.round(S.busy.pct*100)}%"></i></div></div></div>`:'');
+}
+
+/* ============ Acciones ============ */
+const A={
+  tab:d=>{S.modal=null;S.tab=d.t;render()},home:()=>{S.tab='home';S.run=null;render()},close:closeModal,
+  mbg:(d,e)=>{if(e.target.classList.contains('modal'))closeModal()},
+  add:()=>$('#file').click(),
+  paste:()=>modal(`<h2>Pegar texto</h2><input id="pn" placeholder="Nombre (ej. Tema 3)"><textarea id="pt" placeholder="Pega aquí el temario…"></textarea><div class="row"><button class="pri g" data-a="pasteGo">Procesar</button><button class="g" data-a="close">Cancelar</button></div>`),
+  pasteGo:async()=>{const t=$('#pt').value,n=$('#pn').value;S.modal=null;progress('Procesando texto…',.5);await ingestText(n,t);progress(null);render()},
+  runq:d=>{const m=d.mode;if(m==='time')startRun({mode:'time',n:10,learn:true,secs:20});else startRun({mode:m,n:m==='review'||m==='failed'||m==='fav'?20:40,learn:true})},
+  setup:d=>modal(`<h2>🎯 Simulacro</h2><label class="mu sm">Alcance</label><select id="sd"><option value="">Todos los documentos</option>${S.docs.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select><label class="mu sm">Preguntas</label><select id="sn"><option>40</option><option>20</option><option>10</option></select><label class="mu sm">Modo</label><select id="sm"><option value="0">Examen (corrección al final)</option><option value="1">Aprendizaje (feedback inmediato)</option></select><div class="row" style="margin-top:10px"><button class="pri g" data-a="setupGo">¡Empezar!</button><button class="g" data-a="close">Cancelar</button></div>`),
+  setupGo:()=>{const d=$('#sd').value;startRun({mode:'sim',docIds:d?[d]:null,n:+$('#sn').value,learn:$('#sm').value==='1'})},
+  runN:d=>startRun({mode:'custom',docIds:d.docs?d.docs.split(','):null,n:+d.n,learn:d.learn==='1'}),
+  runDoc:d=>startRun({mode:'sim',docIds:[d.id],n:40,learn:false}),
+  pick:d=>choose(+d.i),next:nextQ,fav:d=>toggleFav(d.id),
+  exit:()=>modal(`<h2>¿Salir?</h2><p class="mu">Tu progreso se guarda y podrás reanudar.</p><div class="row"><button class="g" data-a="close">Seguir</button><button class="pri g" data-a="home2">Salir</button></div>`),
+  home2:async()=>{clearInterval(TM);S.modal=null;await load();S.tab='home';S.run=null;render()},
+  resume:async()=>{const s=S.sessions.find(x=>x.status==='open');if(!s)return;S.run=s.run;S.run.locked=false;S.run.sel=S.run.ans[S.run.i]!=null?S.run.ans[S.run.i]:null;S.tab='run';render();startTimer()},
+  approve:async d=>{
+    const q=qOf(d.id);
+    if(!q||!Array.isArray(q.opts)||q.opts.length!==4||!Number.isInteger(q.ans)||q.ans<0||q.ans>3){
+      toast('No se puede aprobar: estructura de pregunta incorrecta',true);return;
+    }
+    const v=S.vers.find(x=>x.id===q.vid),pg=v&&v.pages.find(p=>p.n===q.ev?.page);
+    if(!pg||pg.flag||!q.ev?.quote||!norm(pg.text).includes(norm(q.ev.quote))){
+      toast('No se puede aprobar: la cita no coincide con una página legible',true);return;
+    }
+    if(new Set(q.opts.map(norm)).size!==4){toast('No se puede aprobar: hay opciones repetidas',true);return}
+    if(!confirm('¿Has comprobado personalmente que la cita respalda la respuesta marcada y que las otras tres opciones son incorrectas?'))return;
+    q.state='validated';q.validatedAt=Date.now();q.reviewedBy='humano';
+    q.checks=(q.checks||[]).map(c=>c.name==='respuesta_respaldada_humana'?{...c,ok:true,why:'Revisada y aprobada por el usuario'}:c);
+    await dbPut('questions',q);await audit('review','Aprobada manualmente '+q.id);render();toast('Aprobada tras revisión humana');
+  },
+  reject:async d=>{const q=qOf(d.id);q.state='rejected';q.reasons=['Rechazada manualmente'];await dbPut('questions',q);await audit('review','Rechazada manualmente '+q.id);render()},
+  tog:async d=>{S.prof[d.k]=!S.prof[d.k];await saveProf();render()},
+  delDoc:d=>modal(`<h2>¿Borrar documento?</h2><p class="mu">Se eliminan sus versiones y preguntas.</p><div class="row"><button class="g" data-a="close">Cancelar</button><button class="dng g" data-a="delGo" data-id="${d.id}">Borrar</button></div>`),
+  delGo:async d=>{for(const v of S.vers.filter(v=>v.docId===d.id)){await dbDel('versions',v.id);await dbDel('files',v.id)}for(const q of S.qs.filter(q=>q.docId===d.id))await dbDel('questions',q.id);await dbDel('docs',d.id);await audit('doc','Documento eliminado');await load();S.modal=null;render()},
+  toc:d=>{const v=S.vers.find(x=>x.id===d.v);const secs=v.sections.length?v.sections:[];modal(`<h2>📑 Índice</h2><p class="mu sm">${secs.length} apartados detectados · ${v.pages.length} páginas</p>${secs.map(s=>`<div class="row sp sm"><span>${esc(s.title)}</span><span class="mu">pág. ${s.page}</span></div>`).join('')||'<p class="mu">No se detectaron títulos; el documento se organiza por páginas.</p>'}<h3 style="margin-top:12px">Preguntas por página</h3><div class="heat">${v.pages.map(p=>{const n=S.qs.filter(q=>q.vid===v.id&&q.ev.page===p.n&&q.state==='validated').length;return`<i title="Pág ${p.n}: ${n}" style="${n?`background:rgba(124,92,255,${Math.min(1,.25+n*.2)})`:''}"></i>`}).join('')}</div><button style="margin-top:14px" data-a="close">Cerrar</button>`)},
+  ocr:async d=>{
+    try{const f=await dbGet('files',d.v);if(!f)throw new Error('PDF original no disponible');const v=S.vers.find(x=>x.id===d.v);progress('Reprocesando página '+d.n+'…',.5);
+      const buf=await f.blob.arrayBuffer(),lib=await pdfLib(),pdf=await lib.getDocument({data:buf}).promise,o=await ocrPage(pdf,+d.n),pg=v.pages.find(p=>p.n===+d.n);
+      pg.text=cleanText(o.text);pg.src='ocr';pg.conf=o.conf;pg.flag=(o.conf<70||pg.text.length<40)?'OCR de baja confianza ('+o.conf+'%)':false;
+      const{chunks,sections}=buildChunks(v.id,v.pages);v.chunks=chunks;v.sections=sections;await dbPut('versions',v);await load();
+      const res=await generateFor(S.vers.find(x=>x.id===d.v));progress(null);toast(pg.flag?'Sigue con baja calidad: '+pg.flag:'Página recuperada · '+res.v+' nuevas validadas',!!pg.flag);
+    }catch(e){progress(null);toast(e.message,true)}
+  },
+  extra:d=>{
+    const doc=S.docs.find(x=>x.id===d.id),v=curVer(doc);let txt='';for(const p of v.pages){if(p.flag)continue;if((txt+p.text).length>12000)break;txt+=`\n[PÁGINA ${p.n}]\n${p.text}`}
+    const prompt=`Eres un redactor de tests. Con el TEXTO de abajo crea preguntas tipo test de 4 alternativas (una sola correcta). Usa SOLO información del texto. Cada pregunta debe incluir la cita literal (copiada tal cual) y su página. Responde SOLO con un JSON válido: [{"q":"enunciado","opts":["A","B","C","D"],"ans":0,"expl":"explicación","page":1,"quote":"cita literal del texto","diff":"facil|media|dificil"}]\n\nTEXTO:${txt}`;
+    window._prompt=prompt;
+    modal(`<h2>🧩 Preguntas desde otro chat</h2><p class="mu sm">1) Copia el prompt y pégalo en cualquier chat de IA gratuito. 2) Pega aquí el JSON que te devuelva. La app comprueba que cada cita exista en la página indicada; la respuesta correcta la apruebas tú en Revisar.</p><button class="g" style="width:100%" data-a="copyP">📋 Copiar prompt</button><textarea id="jt" placeholder='Pega aquí el JSON…'></textarea><div class="row"><button class="pri g" data-a="impJson" data-id="${d.id}">Importar y comprobar</button><button class="g" data-a="close">Cancelar</button></div>`);
+  },
+  copyP:async()=>{try{await navigator.clipboard.writeText(window._prompt);toast('Prompt copiado')}catch(e){toast('No se pudo copiar',true)}},
+  impJson:async d=>{
+    try{const doc=S.docs.find(x=>x.id===d.id),v=curVer(doc);let t=$('#jt').value.trim();const m=t.match(/\[[\s\S]*\]/);if(!m)throw new Error('No se encontró un array JSON');const arr=JSON.parse(m[0]);
+      let acc=[...S.qs.filter(q=>q.vid===v.id)],n=0,bad=0;
+      for(const x of arr){
+        let a=x.ans;if(typeof a==='string'){const L='ABCD'.indexOf(a.trim().toUpperCase()[0]);a=L>=0?L:parseInt(a,10)}
+        const opts=Array.isArray(x.opts)?x.opts.map(o=>typeof o==='string'?o.replace(/^\s*[A-Da-d][).:]\s+/,'').trim():o):x.opts;
+        const q={id:uid(),vid:v.id,docId:v.docId,kind:'ext',q:x.q,opts,ans:a,expl:x.expl||'',ev:{vid:v.id,page:+x.page,chunkId:null,quote:String(x.quote||'')},diff:x.diff||'media',state:'draft',created:Date.now(),srs:{box:0,due:0},st:{seen:0,ok:0,ko:0,last:0},fav:false};
+        const r=verifyQ(q,v,acc);q.state=r.state;q.score=r.score;q.checks=r.checks;q.reasons=r.reasons;if(q.state==='pending_validation')n++;else bad++;acc.push(q);await dbPut('questions',q)}
+      await audit('job',`Importación externa: ${n} pendientes de revisión, ${bad} rechazadas`,{proposed:arr.length,validated:0,rejected:bad,pending:n,tokens:0,cost:0,reasons:{}});await load();S.modal=null;render();toast(`${n} en Revisar, ${bad} rechazadas (cita no encontrada o esquema)`)
+    }catch(e){toast('JSON no válido: '+e.message,true)}
+  },
+  goal:async(d,e)=>{S.prof.goal=+e.target.value;await saveProf();render()},
+  export:async()=>{
+    const data={};for(const s of STORES)data[s]=s==='files'?[]:await dbAll(s);
+    const body=JSON.stringify(data),h=await sha256(new TextEncoder().encode(body).buffer);
+    const out=JSON.stringify({format:'testmaster-v1',created:new Date().toISOString(),sha256:h,includesOriginalPdfs:false,note:'Los PDF originales no se incluyen en esta copia. Conserva los archivos fuente por separado.',data:body});
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'application/json'}));a.download='testmaster-copia-'+today()+'.json';a.click();toast('Copia exportada (sin PDF originales)');
+  },
+  import:()=>$('#imp').click(),
+  audit:()=>{
+    const jobs=S.sessions&&[];dbAll('audit').then(rows=>{
+      const J=rows.filter(r=>r.type==='job'),E=rows.filter(r=>r.type==='error'),sum=k=>J.reduce((s,j)=>s+(j[k]||0),0),R={};J.forEach(j=>Object.entries(j.reasons||{}).forEach(([k,v])=>R[k]=(R[k]||0)+v));
+      const prop=sum('proposed'),val=S.qs.filter(q=>q.state==='validated').length,rej=S.qs.filter(q=>q.state==='rejected').length;
+      modal(`<h2>🧾 Auditoría</h2><div class="grid"><div class="card"><div class="mu sm">Documentos</div><h2>${S.docs.length}</h2></div><div class="card"><div class="mu sm">Propuestas</div><h2>${prop}</h2></div><div class="card"><div class="mu sm">Validadas</div><h2 class="ok">${val}</h2></div><div class="card"><div class="mu sm">Rechazadas</div><h2 class="ko">${rej}</h2></div></div>
+      <p>Aceptación: <b>${prop?Math.round(sum('validated')/prop*100):0}%</b> · Tiempo: ${(sum('ms')/1000).toFixed(1)} s · Tokens: 0 · Coste: 0 €</p>
+      <h3>Motivos de rechazo</h3>${Object.entries(R).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row sp sm"><span>${esc(k)}</span><b>${v}</b></div>`).join('')||'<p class="mu sm">Ninguno.</p>'}
+      <h3 style="margin-top:12px">Errores técnicos (${E.length})</h3>${E.slice(-5).map(e=>`<div class="sm ko">${esc(e.msg)}</div>`).join('')||'<p class="mu sm">Ninguno.</p>'}<button style="margin-top:12px" data-a="close">Cerrar</button>`)});
+  },
+  wipe:()=>modal(`<h2>¿Borrar TODO?</h2><p class="mu">Esto no se puede deshacer. Exporta una copia antes.</p><div class="row"><button class="g" data-a="close">Cancelar</button><button class="dng g" data-a="wipeGo">Borrar todo</button></div>`),
+  wipeGo:async()=>{for(const s of STORES)await dbClear(s);await load();S.modal=null;S.tab='home';render()},
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el)return;const f=A[el.dataset.a];if(f){if(el.tagName==='SELECT')return;f(el.dataset,e)}});
+document.addEventListener('change',e=>{if(e.target.dataset&&e.target.dataset.a==='goal')A.goal({},e)});
+$('#file').addEventListener('change',async e=>{for(const f of e.target.files)await ingest(f);e.target.value='';render()});
+$('#imp').addEventListener('change',async e=>{
+  try{const f=e.target.files[0];if(!f)return;const o=JSON.parse(await f.text());if(o.format!=='testmaster-v1')throw new Error('Formato desconocido');
+    const h=await sha256(new TextEncoder().encode(o.data).buffer);if(h!==o.sha256)throw new Error('La copia está dañada (huella SHA-256 no coincide)');
+    const d=JSON.parse(o.data);for(const s of STORES){if(s==='files')continue;const cur=await dbAll(s),ids=new Map(cur.map(x=>[x.id,x]));
+      const stamp=o=>Math.max((o.st&&o.st.last)||0,o.ts||0,o.validatedAt||0,o.processed||0,o.created||0);
+      for(const x of d[s]||[]){const c=ids.get(x.id);if(!c||stamp(x)>stamp(c)||(s==='kv'&&x.xp>c.xp))await dbPut(s,x)}}
+    await load();render();toast('Copia importada y verificada ✔ (se conservó lo más reciente)')
+  }catch(err){toast(err.message,true)}e.target.value='';
+});
+window.addEventListener('unhandledrejection',e=>{
+  const msg=e.reason&&e.reason.message?e.reason.message:'Error inesperado';
+  audit('error',msg).catch(()=>{});
+  toast('Se ha producido un error. Tus datos guardados no deberían perderse.',true);
+});
+window.addEventListener('error',e=>{
+  audit('error',e.message||'Error JavaScript').catch(()=>{});
+});
+(async()=>{
+  try{await openDB();await load();render();if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{})}
+  catch(e){$('#app').innerHTML='<div class="card">No se pudo abrir el almacenamiento local: '+esc(e.message)+'</div>'}
+})();
+</script>
+</body>
+</html>
